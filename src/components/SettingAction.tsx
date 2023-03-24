@@ -78,7 +78,8 @@ export default function SettingAction(props: {
           }}
           icon="i-carbon:settings"
           label="设置"
-        />
+          text="设置"
+        ></ActionItem>
         <div class="flex">
           <ActionItem
             onClick={async () => {
@@ -138,13 +139,13 @@ function SettingItem(props: {
   )
 }
 
-function ActionItem(props: { onClick: any; icon: string; label?: string }) {
+function ActionItem(props: { onClick: any; icon: string; label?: string;text?:string }) {
   return (
     <div
       class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
       onClick={props.onClick}
     >
-      <button class={props.icon} title={props.label} />
+      <button class={props.icon} title={props.label}></button><span>{props.text}</span>
     </div>
   )
 }
