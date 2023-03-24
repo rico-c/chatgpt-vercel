@@ -52,7 +52,7 @@ export default function SettingAction(props: {
         </SettingItem>
         <SettingItem
           icon="i-carbon:3d-curve-auto-colon"
-          label="开启连续对话，将加倍消耗 Token"
+          label="开启连续对话"
         >
           <label class="relative inline-flex items-center cursor-pointer ml-1">
             <input
