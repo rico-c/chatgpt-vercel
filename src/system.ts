@@ -10,7 +10,7 @@ export const setting = {
 export const message = `Powered by OpenAI
 - 本站仅作为BuyGPT用户购买的账户使用。
 - 请点击设置按钮，并输入您购买的\`API Key\`，即可开始使用。
-- [[Shift]] + [[Enter]] 换行。开头输入 [[/]] 或者 [[空格]] Prompt 预设。[[↑]] 可编辑最近一次提问。点击顶部名称滚动到顶部，点击输入框滚动到底部。`
+- [[Shift]] + [[Enter]] 换行。[[Enter]]发送。`
 
 export type Setting = typeof setting
 
