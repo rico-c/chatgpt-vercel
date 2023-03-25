@@ -19,17 +19,20 @@ export default function SettingAction(props: {
     <div class="text-sm text-slate-7 dark:text-slate mb-2">
       <Show when={shown()}>
         <SettingItem icon="i-carbon:api" label="OpenAI API Key">
-          <input
-            type="password"
-            value={props.setting().openaiAPIKey}
-            class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
-            onInput={e => {
-              props.setSetting({
-                ...props.setting(),
-                openaiAPIKey: (e.target as HTMLInputElement).value
-              })
-            }}
-          />
+          <span>
+            <a class="underline" href="https://buygpt.shop" target="__blank">去购买API KEY</a>
+            <input
+              type="password"
+              value={props.setting().openaiAPIKey}
+              class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+              onInput={e => {
+                props.setSetting({
+                  ...props.setting(),
+                  openaiAPIKey: (e.target as HTMLInputElement).value
+                })
+              }}
+            />
+          </span>
         </SettingItem>
         <SettingItem
           icon="i-carbon:save-image"
@@ -50,10 +53,7 @@ export default function SettingAction(props: {
             <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
           </label>
         </SettingItem>
-        <SettingItem
-          icon="i-carbon:3d-curve-auto-colon"
-          label="开启连续对话"
-        >
+        <SettingItem icon="i-carbon:3d-curve-auto-colon" label="开启连续对话">
           <label class="relative inline-flex items-center cursor-pointer ml-1">
             <input
               type="checkbox"
@@ -125,6 +125,7 @@ export default function SettingAction(props: {
 
 function SettingItem(props: {
   children: JSXElement
+  addon?: JSXElement
   icon: string
   label: string
 }) {
@@ -133,19 +134,26 @@ function SettingItem(props: {
       <div class="flex items-center">
         <button class={props.icon} />
         <span ml-1>{props.label}</span>
+        <span ml-1>{props.addon}</span>
       </div>
       {props.children}
     </div>
   )
 }
 
-function ActionItem(props: { onClick: any; icon: string; label?: string;text?:string }) {
+function ActionItem(props: {
+  onClick: any
+  icon: string
+  label?: string
+  text?: string
+}) {
   return (
     <div
       class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
       onClick={props.onClick}
     >
-      <button class={props.icon} title={props.label}></button><span>{props.text}</span>
+      <button class={props.icon} title={props.label}></button>
+      <span>{props.text}</span>
     </div>
   )
 }
