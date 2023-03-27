@@ -41,7 +41,7 @@ export default function SettingAction(props: {
             <select
               name="model"
               class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center  focus:bg-op-20 focus:ring-0 focus:outline-none"
-              value={props.setting().model}
+              value={props.setting()?.model || 'gpt-3.5-turbo'}
               onChange={e => {
                 props.setSetting({
                   ...props.setting(),
