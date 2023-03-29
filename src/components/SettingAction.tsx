@@ -20,7 +20,7 @@ export default function SettingAction(props: {
       <Show when={shown()}>
         <SettingItem icon="i-carbon:api" label="OpenAI API Key">
           <span>
-            <a class="underline" href="https://buygpt.shop" target="__blank">去购买API KEY</a>
+            <a class="underline" href="https://buygpt.shop" target="__blank">去购买API KEY(将购买的API Key输入到右侧 →)</a>
             <input
               type="password"
               value={props.setting().openaiAPIKey}
