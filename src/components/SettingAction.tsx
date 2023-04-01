@@ -4,6 +4,8 @@ import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage } from "~/types"
 import type { Setting } from "~/system"
+import axios from "axios"
+import { host } from "~/constants/host"
 
 export default function SettingAction(props: {
   setting: Accessor<Setting>
@@ -13,14 +15,42 @@ export default function SettingAction(props: {
   messaages: ChatMessage[]
 }) {
   const [shown, setShown] = createSignal(false)
+  const [loading, setLoading] = createSignal(false)
+  const [loginShown, setLoginShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
+
+  const handleLogin = () => {
+    setLoading(true)
+    axios
+      .get(`${host}/api/login`, {
+        params: {
+          email: props.setting()?.memberEmail,
+          password: props.setting()?.memberPassword
+        }
+      })
+      .then(res => {
+        const keyData = res.data
+        if (keyData?.key) {
+          props.setSetting({
+            ...props.setting(),
+            memberKey: keyData?.key,
+            memberExpire: keyData?.expire_time
+          })
+        }
+        setLoading(false)
+      })
+  }
+
   return (
     <div class="text-sm text-slate-7 dark:text-slate mb-2">
+      {/* 设置 */}
       <Show when={shown()}>
         <SettingItem icon="i-carbon:api" label="OpenAI API Key">
           <span>
-            <a class="underline" href="https://buygpt.shop" target="__blank">去购买API KEY(将购买的API Key输入到右侧 →)</a>
+            <a class="underline" href="https://buygpt.shop" target="__blank">
+              (将购买的API Key输入到右侧 →)
+            </a>
             <input
               type="password"
               value={props.setting().openaiAPIKey}
@@ -34,26 +64,23 @@ export default function SettingAction(props: {
             />
           </span>
         </SettingItem>
-        <SettingItem
-            icon="i-carbon:machine-learning-model"
-            label="OpenAI 模型"
+        <SettingItem icon="i-carbon:machine-learning-model" label="OpenAI 模型">
+          <select
+            name="model"
+            class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center  focus:bg-op-20 focus:ring-0 focus:outline-none"
+            value={props.setting()?.model || "gpt-3.5-turbo"}
+            onChange={e => {
+              props.setSetting({
+                ...props.setting(),
+                model: (e.target as HTMLSelectElement).value as Model
+              })
+            }}
           >
-            <select
-              name="model"
-              class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center  focus:bg-op-20 focus:ring-0 focus:outline-none"
-              value={props.setting()?.model || 'gpt-3.5-turbo'}
-              onChange={e => {
-                props.setSetting({
-                  ...props.setting(),
-                  model: (e.target as HTMLSelectElement).value as Model
-                })
-              }}
-            >
-              <option value="gpt-3.5-turbo">gpt-3.5</option>
-              <option value="gpt-4">gpt-4(8k)</option>
-              <option value="gpt-4-32k">gpt-4(32k)</option>
-            </select>
-          </SettingItem>
+            <option value="gpt-3.5-turbo">gpt-3.5</option>
+            <option value="gpt-4">gpt-4(8k)</option>
+            <option value="gpt-4-32k">gpt-4(32k)</option>
+          </select>
+        </SettingItem>
         <SettingItem
           icon="i-carbon:save-image"
           label="记录对话内容，刷新不会消失"
@@ -91,15 +118,72 @@ export default function SettingAction(props: {
         </SettingItem>
         <hr class="mt-2 bg-slate-5 bg-op-15 border-none h-1px"></hr>
       </Show>
+      {/* 会员登录================================= */}
+      <Show when={loginShown()}>
+        <SettingItem icon="i-carbon:user-avatar-filled" label="会员邮箱">
+          <span>
+            <input
+              placeholder="请输入您的会员邮箱"
+              value={props.setting().memberEmail}
+              class="max-w-200px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+              onInput={e => {
+                props.setSetting({
+                  ...props.setting(),
+                  memberEmail: (e.target as HTMLInputElement).value
+                })
+              }}
+            />
+          </span>
+        </SettingItem>
+        <SettingItem icon="i-carbon:password" label="会员密码">
+          <input
+            type="password"
+            placeholder="请输入您设置的密码"
+            value={props.setting().memberPassword}
+            class="max-w-200px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+            onInput={e => {
+              props.setSetting({
+                ...props.setting(),
+                memberPassword: (e.target as HTMLInputElement).value
+              })
+            }}
+          />
+        </SettingItem>
+        <Show when={props.setting().memberKey}>
+          <SettingItem icon="i-carbon:password" label="会员截止日期">
+            {props.setting().memberExpire}
+          </SettingItem>
+        </Show>
+        <Show when={!props.setting().memberKey}>
+          <div class="flex justify-center">
+            <button class="border-1 px-5" onClick={handleLogin}>
+              {loading() ? "登录中..." : "登录"}
+            </button>
+          </div>
+        </Show>
+        <hr class="mt-2 bg-slate-5 bg-op-15 border-none h-1px"></hr>
+      </Show>
       <div class="mt-2 flex items-center justify-between">
-        <ActionItem
-          onClick={() => {
-            setShown(!shown())
-          }}
-          icon="i-carbon:settings"
-          label="设置"
-          text="设置"
-        ></ActionItem>
+        <div class="flex">
+          <ActionItem
+            onClick={() => {
+              setShown(!shown())
+              setLoginShown(false)
+            }}
+            icon="i-carbon:settings"
+            label="设置"
+            text="设置"
+          ></ActionItem>
+          <ActionItem
+            onClick={() => {
+              setLoginShown(!loginShown())
+              setShown(false)
+            }}
+            icon="i-carbon:login"
+            label={props.setting().memberKey ? "会员已登录" : "会员登录"}
+            text={props.setting().memberKey ? "会员已登录" : "会员登录"}
+          ></ActionItem>
+        </div>
         <div class="flex">
           <ActionItem
             onClick={async () => {

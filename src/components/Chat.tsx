@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import { createEffect, createSignal, For, onMount, Show } from "solid-js"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import MessageItem from "./MessageItem"
@@ -9,8 +10,10 @@ import throttle from "just-throttle"
 import { isMobile } from "~/utils"
 import type { Setting } from "~/system"
 import { makeEventListener } from "@solid-primitives/event-listener"
-import { inject } from '@vercel/analytics'
- 
+import { inject } from "@vercel/analytics"
+import axios from "axios"
+import { host } from "~/constants/host"
+
 inject()
 
 export interface PromptItem {
@@ -79,12 +82,16 @@ export default function (props: {
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
-    const setting = localStorage.getItem("setting")
+
+    const localSetting = localStorage.getItem("setting") as string
     const session = localStorage.getItem("session")
+
     try {
       let archiveSession = false
-      if (setting) {
-        const parsed = JSON.parse(setting)
+      if (localSetting) {
+        const parsed = JSON.parse(localSetting)
+        delete parsed.memberExpire
+        delete parsed.memberKey
         archiveSession = parsed.archiveSession
         setSetting({
           ...defaultSetting,
@@ -115,7 +122,29 @@ export default function (props: {
             }
           ])
       }
-    } catch {
+      const parsed = JSON.parse(localSetting)
+      if (parsed?.memberEmail && parsed?.memberPassword) {
+        // 根据初始化的账号密码获取apikey
+        axios
+          .get(`${host}/api/login`, {
+            params: {
+              email: parsed?.memberEmail,
+              password: parsed?.memberPassword
+            }
+          })
+          .then(res => {
+            const keyData = res.data
+            if (keyData?.key) {
+              setSetting({
+                ...setting(),
+                memberKey: keyData?.key,
+                memberExpire: keyData?.expire_time
+              })
+            }
+          })
+      }
+    } catch (e) {
+      throw e
       console.log("Setting parse error")
     }
   })
@@ -251,6 +280,8 @@ export default function (props: {
         role: "system",
         content: systemRule
       })
+
+    const key = setting().memberKey || setting().openaiAPIKey || undefined
     const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
@@ -259,12 +290,31 @@ export default function (props: {
               k => k.role !== "error"
             )
           : message,
-        key: setting().openaiAPIKey || undefined,
+        key,
         temperature: setting().openaiAPITemperature / 100,
         password: setting().password
       }),
       signal: controller.signal
     })
+    // 没有余额了
+    if (response.status === 429) {
+      axios
+        .get(`${host}/api/keyout`, {
+          params: {
+            key
+          }
+        })
+        .then(res => {
+          const newKey = res.data.newKey
+          setSetting({
+            ...setting(),
+            memberKey: newKey
+          })
+          alert(
+            "刚刚触发了OpenAI余额为空，我们已在后台为您切换了新的连接，您可以继续使用"
+          )
+        })
+    }
     if (!response.ok) {
       const res = await response.json()
       throw new Error(res.error.message)
