@@ -38,6 +38,9 @@ export default function SettingAction(props: {
         }
         setLoading(false)
       })
+      .catch(e => {
+        throw e
+      })
   }
 
   return (

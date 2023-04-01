@@ -138,6 +138,9 @@ export default function (props: {
               })
             }
           })
+          .catch(e => {
+            throw e
+          })
       }
     } catch (e) {
       throw e
@@ -305,6 +308,9 @@ export default function (props: {
           alert(
             "刚刚触发了OpenAI余额为空，我们已在后台为您切换了新的连接，您可以继续使用"
           )
+        })
+        .catch(e => {
+          throw e
         })
     }
     if (!response.ok) {
