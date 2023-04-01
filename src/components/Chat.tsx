@@ -11,7 +11,6 @@ import { isMobile } from "~/utils"
 import type { Setting } from "~/system"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { inject } from "@vercel/analytics"
-import axios from "axios"
 import { host } from "~/constants/host"
 
 inject()
@@ -125,15 +124,12 @@ export default function (props: {
       const parsed = JSON.parse(localSetting)
       if (parsed?.memberEmail && parsed?.memberPassword) {
         // 根据初始化的账号密码获取apikey
-        axios
-          .get(`${host}/api/login`, {
-            params: {
-              email: parsed?.memberEmail,
-              password: parsed?.memberPassword
-            }
-          })
+        fetch(
+          `${host}/api/login?email=${parsed?.memberEmail}&password=${parsed?.memberPassword}`
+        )
+          .then(r => r.json())
           .then(res => {
-            const keyData = res.data
+            const keyData = res
             if (keyData?.key) {
               setSetting({
                 ...setting(),
@@ -298,14 +294,10 @@ export default function (props: {
     })
     // 没有余额了
     if (response.status === 429) {
-      axios
-        .get(`${host}/api/keyout`, {
-          params: {
-            key
-          }
-        })
+      fetch(`${host}/api/keyout?key=${key}`)
+        .then(r => r.json())
         .then(res => {
-          const newKey = res.data.newKey
+          const newKey = res.newKey
           setSetting({
             ...setting(),
             memberKey: newKey

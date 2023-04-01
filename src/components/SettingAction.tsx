@@ -4,7 +4,6 @@ import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage } from "~/types"
 import type { Setting } from "~/system"
-import axios from "axios"
 import { host } from "~/constants/host"
 
 export default function SettingAction(props: {
@@ -22,15 +21,14 @@ export default function SettingAction(props: {
 
   const handleLogin = () => {
     setLoading(true)
-    axios
-      .get(`${host}/api/login`, {
-        params: {
-          email: props.setting()?.memberEmail,
-          password: props.setting()?.memberPassword
-        }
-      })
+    fetch(
+      `${host}/api/login?email=${props.setting()?.memberEmail}&password=${
+        props.setting()?.memberPassword
+      }`
+    )
+      .then(r => r.json())
       .then(res => {
-        const keyData = res.data
+        const keyData = res
         if (keyData?.key) {
           props.setSetting({
             ...props.setting(),
