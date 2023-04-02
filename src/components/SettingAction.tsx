@@ -35,6 +35,8 @@ export default function SettingAction(props: {
             memberKey: keyData?.key,
             memberExpire: keyData?.expire_time
           })
+        } else {
+          alert("登录失败，账号或密码错误")
         }
         setLoading(false)
       })
