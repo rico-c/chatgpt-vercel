@@ -1,5 +1,5 @@
 export const setting = {
-  continuousDialogue: true,
+  continuousDialogue: false,
   archiveSession: false,
   openaiAPIKey: "",
   openaiAPITemperature: 60,
