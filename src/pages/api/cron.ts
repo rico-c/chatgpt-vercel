@@ -89,16 +89,21 @@ async function checkBan(key: string) {
 }
 
 async function push(title: string, desp?: string) {
-  if (sendKey)
-    await fetch(`https://sctapi.ftqq.com/${sendKey}.send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        title,
-        desp,
-        channel: Number.isInteger(sendChannel) ? Number(sendChannel) : 9
+  try {
+    if (sendKey) {
+      await fetch(`https://sctapi.ftqq.com/${sendKey}.send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title,
+          desp,
+          channel: Number.isInteger(sendChannel) ? Number(sendChannel) : 9
+        })
       })
-    })
+    }
+  } catch (e) {
+    throw e
+  }
 }

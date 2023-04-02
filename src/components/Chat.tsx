@@ -264,79 +264,83 @@ export default function (props: {
   }
 
   async function fetchGPT(inputValue: string) {
-    setLoading(true)
-    const controller = new AbortController()
-    setController(controller)
-    const systemRule = setting().systemRule.trim()
-    const message = [
-      {
-        role: "user",
-        content: inputValue
-      }
-    ]
-    if (systemRule)
-      message.push({
-        role: "system",
-        content: systemRule
+    try {
+      setLoading(true)
+      const controller = new AbortController()
+      setController(controller)
+      const systemRule = setting().systemRule.trim()
+      const message = [
+        {
+          role: "user",
+          content: inputValue
+        }
+      ]
+      if (systemRule)
+        message.push({
+          role: "system",
+          content: systemRule
+        })
+
+      const key = setting().memberKey || setting().openaiAPIKey || undefined
+      const response = await fetch("/api", {
+        method: "POST",
+        body: JSON.stringify({
+          messages: setting().continuousDialogue
+            ? [...messageList().slice(0, -1), ...message].filter(
+                k => k.role !== "error"
+              )
+            : message,
+          key,
+          temperature: setting().openaiAPITemperature / 100,
+          password: setting().password
+        }),
+        signal: controller.signal
       })
-
-    const key = setting().memberKey || setting().openaiAPIKey || undefined
-    const response = await fetch("/api", {
-      method: "POST",
-      body: JSON.stringify({
-        messages: setting().continuousDialogue
-          ? [...messageList().slice(0, -1), ...message].filter(
-              k => k.role !== "error"
+      // 没有余额了
+      if (response.status === 429) {
+        fetch(`${host}/api/keyout?key=${key}`)
+          .then(r => r.json())
+          .then(res => {
+            const newKey = res.newKey
+            setSetting({
+              ...setting(),
+              memberKey: newKey
+            })
+            alert(
+              "刚刚触发了OpenAI余额为空，我们已在后台为您切换了新的连接，您可以继续使用"
             )
-          : message,
-        key,
-        temperature: setting().openaiAPITemperature / 100,
-        password: setting().password
-      }),
-      signal: controller.signal
-    })
-    // 没有余额了
-    if (response.status === 429) {
-      fetch(`${host}/api/keyout?key=${key}`)
-        .then(r => r.json())
-        .then(res => {
-          const newKey = res.newKey
-          setSetting({
-            ...setting(),
-            memberKey: newKey
           })
-          alert(
-            "刚刚触发了OpenAI余额为空，我们已在后台为您切换了新的连接，您可以继续使用"
-          )
-        })
-        .catch(e => {
-          throw e
-        })
-    }
-    if (!response.ok) {
-      const res = await response.json()
-      throw new Error(res.error.message)
-    }
-    const data = response.body
-    if (!data) {
-      throw new Error("没有返回数据")
-    }
-    const reader = data.getReader()
-    const decoder = new TextDecoder("utf-8")
-    let done = false
-
-    while (!done) {
-      const { value, done: readerDone } = await reader.read()
-      if (value) {
-        const char = decoder.decode(value)
-        if (char === "\n" && currentAssistantMessage().endsWith("\n")) {
-          continue
-        }
-        if (char) {
-          setCurrentAssistantMessage(currentAssistantMessage() + char)
-        }
+          .catch(e => {
+            throw e
+          })
       }
-      done = readerDone
+      if (!response.ok) {
+        const res = await response.json()
+        throw new Error(res.error.message)
+      }
+      const data = response.body
+      if (!data) {
+        throw new Error("没有返回数据")
+      }
+      const reader = data.getReader()
+      const decoder = new TextDecoder("utf-8")
+      let done = false
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read()
+        if (value) {
+          const char = decoder.decode(value)
+          if (char === "\n" && currentAssistantMessage().endsWith("\n")) {
+            continue
+          }
+          if (char) {
+            setCurrentAssistantMessage(currentAssistantMessage() + char)
+          }
+        }
+        done = readerDone
+      }
+    } catch (e) {
+      throw e
     }
   }
 
