@@ -296,8 +296,8 @@ export default function (props: {
         }),
         signal: controller.signal
       })
-      // 没有余额了
-      if (response.status === 429) {
+      // 没有余额了 && 是会员
+      if (response.status === 429 && setting().memberKey) {
         fetch(`${host}/api/keyout?key=${key}`)
           .then(r => r.json())
           .then(res => {
