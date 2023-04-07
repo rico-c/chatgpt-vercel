@@ -3,6 +3,7 @@ export const setting = {
   archiveSession: false,
   openaiAPIKey: "",
   openaiAPITemperature: 60,
+  model: 'gpt-3.5-turbo',
   password: "",
   systemRule: "",
   // buygpt会员

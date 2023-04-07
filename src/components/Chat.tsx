@@ -281,7 +281,7 @@ export default function (props: {
           content: systemRule
         })
 
-      const key = setting().memberKey || setting().openaiAPIKey || undefined
+      const key = setting().openaiAPIKey || setting().memberKey || undefined
       const response = await fetch("/api", {
         method: "POST",
         body: JSON.stringify({
@@ -292,7 +292,8 @@ export default function (props: {
             : message,
           key,
           temperature: setting().openaiAPITemperature / 100,
-          password: setting().password
+          password: setting().password,
+          model: setting().model
         }),
         signal: controller.signal
       })
