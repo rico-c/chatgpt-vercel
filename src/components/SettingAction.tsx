@@ -23,7 +23,7 @@ export default function SettingAction(props: {
     setLoading(true)
     fetch(
       `${host}/api/login?email=${props.setting()?.memberEmail}&password=${
-        props.setting()?.memberPassword
+        encodeURIComponent(props.setting()?.memberPassword)
       }`
     )
       .then(r => r.json())

@@ -125,7 +125,7 @@ export default function (props: {
       if (parsed?.memberEmail && parsed?.memberPassword) {
         // 根据初始化的账号密码获取apikey
         fetch(
-          `${host}/api/login?email=${parsed?.memberEmail}&password=${parsed?.memberPassword}`
+          `${host}/api/login?email=${parsed?.memberEmail}&password=${encodeURIComponent(parsed?.memberPassword)}`
         )
           .then(r => r.json())
           .then(res => {
