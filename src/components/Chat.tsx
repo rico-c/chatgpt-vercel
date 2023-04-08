@@ -125,7 +125,9 @@ export default function (props: {
       if (parsed?.memberEmail && parsed?.memberPassword) {
         // 根据初始化的账号密码获取apikey
         fetch(
-          `${host}/api/login?email=${parsed?.memberEmail}&password=${encodeURIComponent(parsed?.memberPassword)}`
+          `${host}/api/login?email=${
+            parsed?.memberEmail
+          }&password=${encodeURIComponent(parsed?.memberPassword)}`
         )
           .then(r => r.json())
           .then(res => {
@@ -281,7 +283,7 @@ export default function (props: {
           content: systemRule
         })
 
-      const key = setting().openaiAPIKey || setting().memberKey || undefined
+      const key = setting().memberKey || setting().openaiAPIKey || undefined
       const response = await fetch("/api", {
         method: "POST",
         body: JSON.stringify({
