@@ -4,7 +4,7 @@ import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage } from "~/types"
 import type { Setting } from "~/system"
-import { host } from "~/constants/host"
+import { host, getHost } from "~/constants/host"
 
 export default function SettingAction(props: {
   setting: Accessor<Setting>
@@ -22,7 +22,7 @@ export default function SettingAction(props: {
   const handleLogin = () => {
     setLoading(true)
     fetch(
-      `${host}/api/login?email=${
+      `${getHost()}/api/login?email=${
         props.setting()?.memberEmail
       }&password=${encodeURIComponent(props.setting()?.memberPassword)}`
     )

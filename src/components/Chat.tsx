@@ -11,7 +11,7 @@ import { isMobile } from "~/utils"
 import type { Setting } from "~/system"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { inject } from "@vercel/analytics"
-import { host } from "~/constants/host"
+import { host, getHost } from "~/constants/host"
 
 inject()
 
@@ -125,7 +125,7 @@ export default function (props: {
       if (parsed?.memberEmail && parsed?.memberPassword) {
         // 根据初始化的账号密码获取apikey
         fetch(
-          `${host}/api/login?email=${
+          `${getHost()}/api/login?email=${
             parsed?.memberEmail
           }&password=${encodeURIComponent(parsed?.memberPassword)}`
         )
@@ -301,7 +301,7 @@ export default function (props: {
       })
       // 没有余额了 && 是会员
       if (response.status === 429 && setting().memberKey) {
-        fetch(`${host}/api/keyout?key=${key}`)
+        fetch(`${getHost()}/api/keyout?key=${key}`)
           .then(r => r.json())
           .then(res => {
             const newKey = res.newKey
