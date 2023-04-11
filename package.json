@@ -68,6 +68,7 @@
     "vite-plugin-pwa": "0.14.4",
     "workbox-window": "6.5.4"
   },
+  "packageManager": "yarn@1.22.19",
   "engines": {
     "node": ">18.0.0"
   }
