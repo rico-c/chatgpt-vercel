@@ -1,0 +1,76 @@
+# serverless.yml
+
+component: nextjs # (必选) 组件名称，在该实例中为nextjs
+name: buygpt # 必选) 组件实例名称.
+org: orgDemo # (可选) 用于记录组织信息，默认值为您的腾讯云账户 appid，必须为字符串
+app: appDemo # (可选) 用于记录组织信息. 默认与name相同，必须为字符串
+stage: prod # (可选) 用于区分环境信息，默认值是 dev
+
+inputs:
+  functionName: nextjsDemo # 云函数名称
+  serviceName: mytest # api网关服务名称
+  runtime: Nodejs10.15 # 运行环境
+  src: ./src # 第一种为string时，会打包src对应目录下的代码上传到默认cos上。
+  layers:
+    - name: layerName #  layer名称
+      version: 1 #  版本
+  functionConf: # 函数配置相关
+    timeout: 10 # 超时时间，单位秒
+    eip: false # 是否固定出口IP
+    memorySize: 128 # 内存大小，单位MB
+    environment: #  环境变量
+      variables: #  环境变量数组
+        TEST: vale
+    vpcConfig: # 私有网络配置
+      vpcId: '' # 私有网络的Id
+      subnetId: '' # 子网ID
+  apigatewayConf: #  api网关配置
+    isDisabled: false # 是否禁用自动创建 API 网关功能
+    isBase64Encoded: false # 是否开启 base64 编码
+    enableCORS: true #  允许跨域
+    customDomains: # 自定义域名绑定
+      - domain: abc.com # 待绑定的自定义的域名
+        certificateId: abcdefg # 待绑定自定义域名的证书唯一 ID
+        # 如要设置自定义路径映射，请设置为 false
+        isDefaultMapping: false
+        # 自定义路径映射的路径。使用自定义映射时，可一次仅映射一个 path 到一个环境，也可映射多个 path 到多个环境。并且一旦使用自定义映射，原本的默认映射规则不再生效，只有自定义映射路径生效。
+        pathMappingSet:
+          - path: /
+            environment: release
+        protocols: # 绑定自定义域名的协议类型，默认与服务的前端协议一致。
+          - http # 支持http协议
+          - https # 支持https协议
+    protocols:
+      - http
+      - https
+    environment: test
+    serviceTimeout: 15
+    usagePlan: #  用户使用计划
+      usagePlanId: 1111
+      usagePlanName: slscmp
+      usagePlanDesc: sls create
+      maxRequestNum: 1000
+    auth: #  密钥
+      secretName: secret
+      secretIds:
+        - xxx
+  staticConf:
+    cosConf:
+      bucket: static-bucket
+      sources:
+        - src: .next/static
+          targetDir: /_next/static
+        - src: public
+          targetDir: /
+    cdnConf:
+      area: mainland
+      domain: cnode.yuga.chat
+      autoRefresh: true
+      refreshType: delete
+      forceRedirect:
+        switch: on
+        redirectType: https
+        redirectStatusCode: 301
+      https:
+        http2: on
+        certId: 'abc'
