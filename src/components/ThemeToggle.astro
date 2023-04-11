@@ -36,6 +36,9 @@
   const persistentTheme = localStorage.getItem("theme")
   const darkSchema = window.matchMedia("(prefers-color-scheme: dark)")
   function toggle(flag) {
+    if (typeof document === 'undefined') {
+      return
+    }
     document.documentElement.classList.toggle("dark", flag)
     document
       .querySelector('meta[name="theme-color"]')
@@ -54,6 +57,9 @@
   }
 
   function handleToggleTheme() {
+    if (typeof document === 'undefined') {
+      return
+    }
     const element = document.documentElement
     element.classList.toggle("dark")
 

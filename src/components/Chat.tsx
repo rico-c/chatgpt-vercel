@@ -49,10 +49,12 @@ export default function (props: {
 
   const scrollToBottom = throttle(
     () => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-      })
+      if (typeof document !== "undefined") {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth"
+        })
+      }
     },
     250,
     { leading: false, trailing: true }
@@ -76,8 +78,10 @@ export default function (props: {
       },
       { passive: true }
     )
-    document.querySelector("main")?.classList.remove("before")
-    document.querySelector("main")?.classList.add("after")
+    if (typeof document !== "undefined") {
+      document.querySelector("main")?.classList.remove("before")
+      document.querySelector("main")?.classList.add("after")
+    }
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })

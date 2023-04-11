@@ -2,6 +2,9 @@ export async function copyToClipboard(text: string) {
   try {
     return await navigator.clipboard.writeText(text)
   } catch {
+    if (typeof document === 'undefined') {
+      return
+    }
     const element = document.createElement("textarea")
     const previouslyFocusedElement = document.activeElement
 

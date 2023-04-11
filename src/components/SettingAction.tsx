@@ -271,6 +271,9 @@ function ActionItem(props: {
 }
 
 async function exportJpg() {
+  if (typeof document === 'undefined') {
+    return
+  }
   const messageContainer = document.querySelector(
     "#message-container"
   ) as HTMLElement
