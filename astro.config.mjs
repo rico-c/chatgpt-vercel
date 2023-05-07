@@ -89,5 +89,8 @@ export default defineConfig({
     })
   ],
   output: "server",
-  adapter: adapter()
+  adapter: adapter(),
+  server: {
+    port: 80
+  }
 })

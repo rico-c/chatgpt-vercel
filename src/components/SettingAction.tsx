@@ -36,6 +36,8 @@ export default function SettingAction(props: {
             memberExpire: keyData?.expire_time
           })
           setLoginShown(false)
+        } else if (keyData?.expired){
+          alert("您的会员账号已过期，前往 https://www.buygpt.shop?f=member 享受老会员专属续费价格")
         } else {
           alert("登录失败，账号或密码错误")
         }
