@@ -321,8 +321,29 @@ export default function (props: {
             throw e
           })
       }
+      console.log('>>>', response)
       if (!response.ok) {
         const res = await response.json()
+        console.log('>>>1', res)
+
+        if (res.error.code === "account_deactivated") {
+          fetch(`${getHost()}/api/keyout?key=${key}`)
+            .then(r => r.json())
+            .then(res => {
+              const newKey = res.newKey
+              setSetting({
+                ...setting(),
+                memberKey: newKey
+              })
+              alert(
+                "刚刚触发了OpenAI余额为空，我们已在后台为您切换了新的连接，您可以继续使用"
+              )
+            })
+            .catch(e => {
+              throw e
+            })
+        }
+
         throw new Error(res.error.message)
       }
       const data = response.body
