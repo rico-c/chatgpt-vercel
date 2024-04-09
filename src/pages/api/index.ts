@@ -37,8 +37,8 @@ export const config = {
 export const localKey = import.meta.env.OPENAI_API_KEY || ""
 
 export const baseURL = import.meta.env.NOGFW
-  ? "api.openai.com"
-  : (import.meta.env.OPENAI_API_BASE_URL || "api.openai.com").replace(
+  ? "api.gptsapi.net"
+  : (import.meta.env.OPENAI_API_BASE_URL || "api.gptsapi.net").replace(
       /^https?:\/\//,
       ""
     )
